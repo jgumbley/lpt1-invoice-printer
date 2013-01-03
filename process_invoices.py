@@ -16,6 +16,7 @@ def wait_for_change_to_file(filename):
         sleep(1)
         log_to_screen("waiting for an invoice.")
     log_to_screen("found a change - hold on for 10 seconds or so...")
+    log_to_screen("remember to press <CTRL> <ALT> to exit out of vmplayer")
     return
 
 def file_signature(filename):
@@ -88,7 +89,7 @@ def clean_line(line):
     return line[:-1]
 
 def make_pdf_filename():
-    return str(uuid.uuid1())[8:] + ".pdf"
+    return str(uuid.uuid1())[9:] + ".pdf"
 
 def spawn_pdf_viewer(filename):
     log_to_screen("opening PDF in viewer")

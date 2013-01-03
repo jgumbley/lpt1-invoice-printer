@@ -15,7 +15,7 @@ def wait_for_change_to_file(filename):
     while file_signature(filename) == file_sig:
         sleep(1)
         log_to_screen("waiting for an invoice.")
-    log_to_screen("found a change")
+    log_to_screen("found a change - hold on for 10 seconds or so...")
     return
 
 def file_signature(filename):
@@ -48,22 +48,44 @@ def dump_file(filename):
 def blank_file(filename):
     open(filename, 'w').close()
 
+def do_paginate(file_content):
+    page1 = []
+    page2 = []
+    second_page = False
+    for line in file_content:
+        if "" in line:
+            second_page = True
+            log_to_screen("its a two pager :S")
+        if not second_page:
+            page1.append(line)
+        else:
+            page2.append(line)
+    make_invoice(page1)
+    if len(page2)>0:
+        make_invoice(page2)
 
-def make_invoice(file_content, filename):
+
+def make_invoice(file_content):
+    filename = make_pdf_filename()
     log_to_screen("making a PDF")
     c = canvas.Canvas(filename)
     c.setFont("Courier", 11)
     x = 800
     for line in file_content:
+        c.drawString(20,x,clean_line(line))
         if "G" in line:
             c.setFont("Courier-Bold", 11)
         if "H" in line:
             c.setFont("Courier", 11)
-        line = line.replace("G", "")
-        line = line.replace("H", "")
-        c.drawString(20,x,line[:-1])
         x = x - 12
     c.save()
+    spawn_pdf_viewer(filename)
+
+def clean_line(line):
+    line = line.replace("G", "")
+    line = line.replace("H", "")
+    line = line.replace("", "")
+    return line[:-1]
 
 def make_pdf_filename():
     return str(uuid.uuid1())[8:] + ".pdf"
@@ -84,10 +106,8 @@ if __name__ == '__main__':
         blank_file(LPT_OUTPUT_FILE)
         do_header(LPT_OUTPUT_FILE)
         wait_for_change_to_file(LPT_OUTPUT_FILE)
-        sleep(2) # make sure MASS89 has finished writing it
+        sleep(10) # make sure MASS89 has finished writing it
         file_content = dump_file(LPT_OUTPUT_FILE)
-        pdf_filename = make_pdf_filename()
-        make_invoice(file_content, pdf_filename)
+        do_paginate(file_content)
         blank_file(LPT_OUTPUT_FILE)
-        spawn_pdf_viewer(pdf_filename)
 

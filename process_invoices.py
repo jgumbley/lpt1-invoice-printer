@@ -2,6 +2,8 @@ import hashlib
 import os
 from time import sleep
 from reportlab.pdfgen import canvas
+import uuid
+
 
 LPT_OUTPUT_FILE = "C:\\mass-89\\invoice.txt"
 
@@ -44,9 +46,9 @@ def blank_file(filename):
     open(filename, 'w').close()
 
 
-def make_invoice(file_content):
+def make_invoice(file_content, filename):
     print "making a PDF"
-    c = canvas.Canvas("hello.pdf")
+    c = canvas.Canvas(filename)
     c.setFont("Courier", 11)
     x = 800
     for line in file_content:
@@ -60,6 +62,11 @@ def make_invoice(file_content):
         x = x - 12
     c.save()
 
+def make_pdf_filename():
+    return str(uuid.uuid1())[8:] + ".pdf"
+
+def spawn_pdf_viewer(filename):
+    os.system("start " + filename)
 
 if __name__ == '__main__':
     while True:
@@ -67,6 +74,8 @@ if __name__ == '__main__':
         wait_for_change_to_file(LPT_OUTPUT_FILE)
         sleep(2) # make sure MASS89 has finished writing it
         file_content = dump_file(LPT_OUTPUT_FILE)
-        make_invoice(file_content)
+        pdf_filename = make_pdf_filename()
+        make_invoice(file_content, pdf_filename)
         blank_file(LPT_OUTPUT_FILE)
+        spawn_pdf_viewer(pdf_filename)
 

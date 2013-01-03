@@ -3,13 +3,13 @@ import os
 from time import sleep
 from reportlab.pdfgen import canvas
 
-LPT_OUTPUT_FILE = "C:\\Users\\jgumbley\\Documents\\GitHub\\ascii-invoice-printer\\invoice.txt"
+LPT_OUTPUT_FILE = "C:\\mass-89\\invoice.txt"
 
 def wait_for_change_to_file(filename):
     file_sig = file_signature(filename)
     while file_signature(filename) == file_sig:
         sleep(1)
-        print "waiting for changes."
+        print "waiting for an invoice."
     print "found a change"
     return
 
